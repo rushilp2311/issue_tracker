@@ -1,0 +1,3 @@
+{
+  "db": "postgresql://rushildp:aarya2006@localhost:5432/issue_tracker_test"
+}

@@ -6,5 +6,7 @@
     "noEmit": true,
     "baseUrl": "./src",
     "esModuleInterop": true
-  }
+  },
+  "include": ["**/*"],
+  "exclude": ["/node_modules", "/dist"]
 }

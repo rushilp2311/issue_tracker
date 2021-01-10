@@ -4,7 +4,7 @@ import users from './router/users';
 import utils from './router/utils';
 async () => await db();
 const app = express();
-
+app.use(express.json());
 //router use
 app.use('/api/users', users);
 app.use('/api/utils', utils);

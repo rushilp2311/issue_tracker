@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 const express = require('express');
 import { validateLogin } from '../service/user';
 

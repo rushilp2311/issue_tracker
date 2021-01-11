@@ -1,6 +1,7 @@
 import db from '../database/db';
 import jwt from 'jsonwebtoken';
 import Joi from 'joi';
+import config from 'config';
 
 interface User {
   name: string;
@@ -28,18 +29,19 @@ const registerSchema = Joi.object({
 });
 
 function generateAuthToken(user: User): string {
-  const token = jwt.sign({
-    name: user.name,
-    email: user.email,
-    company_id: user.company_id,
-    is_admin: user.is_admin,
-  });
+  const token = jwt.sign(
+    {
+      name: user.name,
+      email: user.email,
+      company_id: user.company_id,
+      is_admin: user.is_admin,
+    },
+    config.get('jwtPrivateKey'),
+  );
   return token;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-function validateLogin(user: any): Joi.ValidationResult {
+function validateLogin(user: User): Joi.ValidationResult {
   return loginSchema.validate(user);
 }
 function validateRegister(user: User): Joi.ValidationResult {
@@ -62,9 +64,10 @@ async function registerUser(user: User): Promise<any> {
 async function getUserByEmail(email: string): Promise<any> {
   return await db.then(async pool => {
     try {
-      const {
-        rows,
-      } = await pool.query('SELECT name FROM member WHERE email = $1', [email]);
+      const { rows } = await pool.query(
+        'SELECT * FROM member WHERE email = $1',
+        [email],
+      );
       return rows;
     } catch (error) {
       console.log(error);

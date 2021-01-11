@@ -6,6 +6,7 @@ const {
   generateAuthToken,
   getUserByEmail,
 } = require('../service/user');
+const { adminAuth } = require('../middleware/auth');
 
 const router = express.Router();
 router.get('/', (req, res) => {
@@ -41,7 +42,7 @@ router.post('/admin', async (req, res) => {
     .send('Admin Added Successfully');
 });
 
-router.post('/registeruser', async (req, res) => {
+router.post('/registeruser', adminAuth, async (req, res) => {
   //check for admin
   const { error } = validateRegister(req.body);
   if (error) return res.status(400).send(error.details[0].message);

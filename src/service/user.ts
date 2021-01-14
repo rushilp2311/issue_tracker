@@ -50,11 +50,11 @@ function generateAuthToken(user: User): string {
 function validateLogin(user: User): Joi.ValidationResult {
   return loginSchema.validate(user);
 }
-function validateUser(user: User): Joi.ValidationResult {
+function validateMember(user: User): Joi.ValidationResult {
   return registerSchema.validate(user);
 }
 
-async function registerUser(user: User): Promise<User[]> {
+async function registerMember(user: User): Promise<User[]> {
   return await db.then(async pool => {
     try {
       await pool.query(
@@ -67,7 +67,7 @@ async function registerUser(user: User): Promise<User[]> {
   });
 }
 
-async function getUserByEmail(email: string): Promise<User[]> {
+async function getMemberByEmail(email: string): Promise<User[]> {
   return await db.then(async pool => {
     try {
       const { rows } = await pool.query(
@@ -104,12 +104,32 @@ async function assignUserRole(access: MemberAccess): Promise<void> {
   });
 }
 
+async function changeMemberPassword(
+  email: string,
+  password: string,
+): Promise<User[]> {
+  return await db.then(async pool => {
+    try {
+      const {
+        rows,
+      } = await pool.query('UPDATE member SET password = $1 where email = $2', [
+        password,
+        email,
+      ]);
+      return rows;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}
+
 export {
   generateAuthToken,
-  getUserByEmail,
+  getMemberByEmail,
   validateLogin,
-  validateUser,
-  registerUser,
+  validateMember,
+  registerMember,
   deleteUserByEmail,
   assignUserRole,
+  changeMemberPassword,
 };

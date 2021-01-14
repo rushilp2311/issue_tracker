@@ -1,20 +1,20 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const {
-  validateUser,
-  registerUser,
+  validateMember,
+  registerMember,
   generateAuthToken,
-  getUserByEmail,
+  getMemberByEmail,
   deleteUserByEmail,
 } = require('../service/user');
 const { adminAuth } = require('../middleware/auth');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
-  const { error } = validateUser(req.body);
+  const { error } = validateMember(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  let user = await getUserByEmail(req.body.email);
+  let user = await getMemberByEmail(req.body.email);
 
   if (user.length > 0)
     return res
@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
   user = req.body;
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
-  await registerUser(user);
+  await registerMember(user);
   const token = generateAuthToken(user);
   res
     .header('x-auth-token', token)
@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
 });
 
 router.delete('/deletemember', adminAuth, async (req, res) => {
-  let user = await getUserByEmail(req.body.email);
+  let user = await getMemberByEmail(req.body.email);
 
   if (user.length > 1) {
     await deleteUserByEmail(req.body.email);

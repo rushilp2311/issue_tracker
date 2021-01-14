@@ -3,7 +3,7 @@ const express = require('express');
 
 const {
   generateAuthToken,
-  getUserByEmail,
+  getMemberByEmail,
   validateLogin,
 } = require('../service/user');
 
@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
   const { error } = validateLogin(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   try {
-    const user = await getUserByEmail(req.body.email);
+    const user = await getMemberByEmail(req.body.email);
 
     if (user.length < 1)
       return res.status(400).send('Invalid email or password');

@@ -44,11 +44,11 @@ function generateAuthToken(user: User): string {
 function validateLogin(user: User): Joi.ValidationResult {
   return loginSchema.validate(user);
 }
-function validateRegister(user: User): Joi.ValidationResult {
+function validateUser(user: User): Joi.ValidationResult {
   return registerSchema.validate(user);
 }
 
-async function registerUser(user: User): Promise<any> {
+async function registerUser(user: User): Promise<User[]> {
   return await db.then(async pool => {
     try {
       await pool.query(
@@ -61,7 +61,7 @@ async function registerUser(user: User): Promise<any> {
   });
 }
 
-async function getUserByEmail(email: string): Promise<any> {
+async function getUserByEmail(email: string): Promise<User[]> {
   return await db.then(async pool => {
     try {
       const { rows } = await pool.query(
@@ -75,10 +75,21 @@ async function getUserByEmail(email: string): Promise<any> {
   });
 }
 
+async function deleteUserByEmail(email: string): Promise<void> {
+  await db.then(async pool => {
+    try {
+      await pool.query('DELETE FROM member WHERE email = $1', [email]);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}
+
 export {
   generateAuthToken,
   getUserByEmail,
   validateLogin,
-  validateRegister,
+  validateUser,
   registerUser,
+  deleteUserByEmail,
 };

@@ -1,24 +1,17 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const {
-  validateRegister,
+  validateUser,
   registerUser,
   generateAuthToken,
   getUserByEmail,
+  deleteUserByEmail,
 } = require('../service/user');
 const { adminAuth } = require('../middleware/auth');
-
 const router = express.Router();
-router.get('/', (req, res) => {
-  try {
-    res.send('Hello User');
-  } catch (error) {
-    console.error(error);
-  }
-});
 
-router.post('/admin', async (req, res) => {
-  const { error } = validateRegister(req.body);
+router.post('/', async (req, res) => {
+  const { error } = validateUser(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   let user = await getUserByEmail(req.body.email);
@@ -42,30 +35,23 @@ router.post('/admin', async (req, res) => {
     .send('Admin Added Successfully');
 });
 
-router.post('/registeruser', adminAuth, async (req, res) => {
-  //check for admin
-  const { error } = validateRegister(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.delete('/', adminAuth, async (req, res) => {
+  // const { error } = validateUser(req.body);
+  // if (error) return res.status(400).send(error.details[0].message);
   let user = await getUserByEmail(req.body.email);
 
-  if (user.length > 0) return res.status(400).send('User already registered.');
-
-  user = req.body;
-  const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(user.password, salt);
-  await registerUser(user);
-  res
-    .status(200)
-    .send('User Added Successfully. And Email sent to user with credentials');
+  if (user.length > 1) {
+    await deleteUserByEmail(req.body.email);
+    res
+      .status(200)
+      .send('Member Deleted Successfully. Email sended to the member');
+  } else
+    res
+      .status(400)
+      .send(
+        "Some error cccured while deleting the user.Check if the user's email it correct.",
+      );
+  //Send email;
 });
-
-/**
- * TODO: Password Reset function checks for the user. Resets the password for the member.
- */
-
-/**
- * TODO: Function to Get User Info
- */
 
 module.exports = router;

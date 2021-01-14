@@ -13,7 +13,7 @@
     "format": "yarn prettier --write",
     "check-format": "yarn prettier --list-different",
     "validate": "npm-run-all --parallel check-types check-format lint build",
-    "start": "nodemon --watch src/ --exec 'node out/index.js' --verbose -e ts"
+    "start": "nodemon --watch src/ "
   },
   "dependencies": {
     "bcrypt": "^5.0.0",

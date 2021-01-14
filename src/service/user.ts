@@ -13,6 +13,12 @@ interface User {
   password: string;
 }
 
+interface MemberAccess {
+  member_id: number;
+  project_id: number;
+  role_id: number;
+}
+
 const loginSchema = Joi.object({
   email: Joi.string().email().min(6).max(255).required(),
   password: Joi.string().min(6).max(255).required(),
@@ -85,6 +91,19 @@ async function deleteUserByEmail(email: string): Promise<void> {
   });
 }
 
+async function assignUserRole(access: MemberAccess): Promise<void> {
+  await db.then(async pool => {
+    try {
+      await pool.query(
+        'INSERT INTO member_access(member_id, project_id, role_id) VALUES ($1, $2, $3)',
+        [access.member_id, access.project_id, access.role_id],
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}
+
 export {
   generateAuthToken,
   getUserByEmail,
@@ -92,4 +111,5 @@ export {
   validateUser,
   registerUser,
   deleteUserByEmail,
+  assignUserRole,
 };

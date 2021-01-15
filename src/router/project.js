@@ -13,12 +13,16 @@ router.post('/', adminAuth, async (req, res) => {
 
   let project = await createProject(req.body);
   if (project.length !== 0) {
-    await assignUserRole({
-      member_id: req.body.member_id,
-      project_id: project[0].project_id,
-      role_id: req.body.role_id,
-    });
-    return res.status(200).send('Project added.');
+    {
+      if (req.body.member_id) {
+        await assignUserRole({
+          member_id: req.body.member_id,
+          project_id: project[0].project_id,
+          role_id: 4,
+        });
+      }
+      return res.status(200).send('Project added.');
+    }
   } else {
     return res.status(400).send('Error Occured while creating Project.');
   }

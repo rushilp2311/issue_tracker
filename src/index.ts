@@ -5,6 +5,7 @@ import utils from './router/utils';
 import auth from './router/auth';
 import admin from './router/admin';
 import project from './router/project';
+import company from './router/company';
 async () => await db();
 const app = express();
 app.use(express.json());
@@ -14,6 +15,7 @@ app.use('/api/utils', utils);
 app.use('/api/auth', auth);
 app.use('/api/admin', admin);
 app.use('/api/project', project);
+app.use('/api/company', company);
 
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => {

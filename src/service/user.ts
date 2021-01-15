@@ -92,12 +92,15 @@ async function deleteUserByEmail(email: string): Promise<void> {
 }
 
 async function assignUserRole(access: MemberAccess): Promise<void> {
-  await db.then(async pool => {
+  return await db.then(async pool => {
     try {
-      await pool.query(
+      const {
+        rows,
+      } = await pool.query(
         'INSERT INTO member_access(member_id, project_id, role_id) VALUES ($1, $2, $3)',
         [access.member_id, access.project_id, access.role_id],
       );
+      return rows;
     } catch (error) {
       console.log(error);
     }

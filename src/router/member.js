@@ -6,6 +6,7 @@ const {
   getMemberByEmail,
   changeMemberPassword,
 } = require('../service/user');
+const { assignUserRole } = require('../service/user');
 const { adminAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -17,11 +18,10 @@ router.get('/', (req, res) => {
   }
 });
 
-router.post('/registerMember', adminAuth, async (req, res) => {
-  //check for admin
+router.post('/registermember', adminAuth, async (req, res) => {
   const { error } = validateMember(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-
+  console.log(req.user);
   let member = await getMemberByEmail(req.body.email);
 
   if (member.length > 0)
@@ -38,10 +38,6 @@ router.post('/registerMember', adminAuth, async (req, res) => {
     );
 });
 
-/**
- * TODO: Password Reset function checks for the user. Resets the password for the member.
- */
-
 router.put('/resetpassword', async (req, res) => {
   let member = await getMemberByEmail(req.body.email);
   if (member.length < 1)
@@ -55,8 +51,13 @@ router.put('/resetpassword', async (req, res) => {
   if (result.length < 1) res.status(200).send('Password Updated Successfully.');
 });
 
-/**
- * TODO: Function to Get User Info
- */
+router.post('/assignrole', adminAuth, async (req, res) => {
+  let role = await assignUserRole({
+    member_id: req.body.member_id,
+    project_id: req.body.project_id,
+    role_id: req.body.role_id,
+  });
+  if (role.length < 1) res.status(200).send('Role assigned to Member.');
+});
 
 module.exports = router;

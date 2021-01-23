@@ -5,14 +5,16 @@ const {
   registerMember,
   getMemberByEmail,
   changeMemberPassword,
+  getAllMembers,
 } = require('../service/user');
 const { assignUserRole } = require('../service/user');
 const { adminAuth } = require('../middleware/auth');
 
 const router = express.Router();
-router.get('/', (req, res) => {
+router.get('/allmembers', adminAuth, async (req, res) => {
   try {
-    res.send('Hello User');
+    const members = await getAllMembers();
+    res.status(200).send(members);
   } catch (error) {
     console.error(error);
   }

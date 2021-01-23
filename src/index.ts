@@ -6,9 +6,11 @@ import auth from './router/auth';
 import admin from './router/admin';
 import project from './router/project';
 import company from './router/company';
+import cors from 'cors';
 async () => await db();
 const app = express();
 app.use(express.json());
+app.use(cors());
 //router use
 app.use('/api/member', member);
 app.use('/api/utils', utils);

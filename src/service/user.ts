@@ -107,6 +107,19 @@ async function assignUserRole(access: MemberAccess): Promise<void> {
   });
 }
 
+async function getAllMembers(): Promise<void> {
+  return await db.then(async pool => {
+    try {
+      const { rows } = await pool.query(
+        'SELECT member_id, name, email, company_id, joining_date, last_login from member',
+      );
+      return rows;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}
+
 async function changeMemberPassword(
   email: string,
   password: string,
@@ -135,4 +148,5 @@ export {
   deleteUserByEmail,
   assignUserRole,
   changeMemberPassword,
+  getAllMembers,
 };

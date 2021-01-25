@@ -7,16 +7,23 @@ const {
   getMemberByEmail,
   deleteUserByEmail,
 } = require('../service/user');
+const { getCompanyById, addCompany } = require('../service/company');
 const { adminAuth } = require('../middleware/auth');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
-  const { error } = validateMember(req.body);
+  const { error } = validateMember({
+    name: req.body.name,
+    email: req.body.email,
+    company_id: req.body.company_id,
+    is_admin: req.body.is_admin,
+    password: req.body.password,
+  });
   if (error) return res.status(400).send(error.details[0].message);
 
   let user = await getMemberByEmail(req.body.email);
-
-  if (user.length > 0)
+  let company = await getCompanyById(req.body.company_id);
+  if (user.length > 0 || company.length > 0)
     return res
       .status(400)
       .send(
@@ -26,7 +33,17 @@ router.post('/', async (req, res) => {
   user = req.body;
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
-  await registerMember(user);
+  await addCompany({
+    company_id: user.company_id,
+    company_name: user.company_name,
+  });
+  await registerMember({
+    name: user.name,
+    email: user.email,
+    company_id: user.company_id,
+    is_admin: user.is_admin,
+    password: user.password,
+  });
   const token = generateAuthToken(user);
   res
     .header('x-auth-token', token)

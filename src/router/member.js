@@ -13,7 +13,7 @@ const { adminAuth } = require('../middleware/auth');
 const router = express.Router();
 router.get('/allmembers', adminAuth, async (req, res) => {
   try {
-    const members = await getAllMembers();
+    const members = await getAllMembers(req.headers.company_id);
     res.status(200).send(members);
   } catch (error) {
     console.error(error);

@@ -107,11 +107,14 @@ async function assignUserRole(access: MemberAccess): Promise<void> {
   });
 }
 
-async function getAllMembers(): Promise<void> {
+async function getAllMembers(company_id: string): Promise<void> {
   return await db.then(async pool => {
     try {
-      const { rows } = await pool.query(
-        'SELECT member_id, name, email, company_id, joining_date, last_login from member',
+      const {
+        rows,
+      } = await pool.query(
+        'SELECT member_id, name, email, company_id, joining_date, last_login from member where company_id = $1',
+        [company_id],
       );
       return rows;
     } catch (error) {

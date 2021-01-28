@@ -2,6 +2,7 @@ const express = require('express');
 const _ = require('lodash');
 const { assignUserRole } = require('../service/user');
 const { validateProject, createProject } = require('../service/project');
+const { addProjectToCompany } = require('../service/company');
 const { adminAuth } = require('../middleware/auth');
 const router = express.Router();
 
@@ -20,6 +21,17 @@ router.post('/', adminAuth, async (req, res) => {
           project_id: project[0].project_id,
           role_id: 4,
         });
+        const result = await addProjectToCompany({
+          company_id: req.body.company_id,
+          project_id: project[0].project_id,
+        });
+        if (result.length > 1) {
+          res
+            .status(400)
+            .send(
+              `Error while adding it to the company with id ${req.body.company_id}`,
+            );
+        }
       }
       return res.status(200).send('Project added.');
     }

@@ -44,8 +44,25 @@ async function addCompany(company: Company) {
   });
 }
 
+async function addProjectToCompany(project) {
+  return await db.then(async pool => {
+    try {
+      const {
+        rows,
+      } = await pool.query(
+        'INSERT INTO company_projects(company_id, project_id) VALUES ($1, $2)',
+        [project.company_id, project.project_id],
+      );
+      return rows;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}
+
 module.exports = {
   validateCompany,
   getCompanyById,
   addCompany,
+  addProjectToCompany,
 };

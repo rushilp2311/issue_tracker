@@ -1,7 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const {
-  validateMember,
   registerMember,
   getMemberByEmail,
   changeMemberPassword,
@@ -21,15 +20,20 @@ router.get('/allmembers', adminAuth, async (req, res) => {
 });
 
 router.post('/registermember', adminAuth, async (req, res) => {
-  const { error } = validateMember(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-  console.log(req.user);
+  // const { error } = validateMember(req.body);
+  // if (error) return res.status(400).send(error.details[0].message);
   let member = await getMemberByEmail(req.body.email);
 
   if (member.length > 0)
     return res.status(400).send('Member already registered in your team.');
 
-  member = req.body;
+  member = {
+    name: req.body.name,
+    email: req.body.email,
+    company_id: req.body.company_id,
+    is_admin: false,
+    password: 'demopwd',
+  };
   const salt = await bcrypt.genSalt(10);
   member.password = await bcrypt.hash(member.password, salt);
   await registerMember(member);

@@ -10,7 +10,7 @@ interface Project {
 
 const projectSchema = Joi.object({
   project_name: Joi.string().min(1).max(255).required(),
-  status_id: Joi.number().required(),
+  status_id: Joi.number(),
   creation_date: Joi.string(),
   due_date: Joi.string(),
 });
@@ -25,8 +25,8 @@ async function createProject(project: Project): Promise<Project[]> {
       const {
         rows,
       } = await pool.query(
-        'INSERT INTO project(project_name, status_id) VALUES ($1, $2 ) RETURNING project_id',
-        [project.project_name, project.status_id],
+        'INSERT INTO project(project_name, due_date) VALUES ($1, $2) RETURNING project_id',
+        [project.project_name, project.due_date],
       );
       return rows;
     } catch (error) {

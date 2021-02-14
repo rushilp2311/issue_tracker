@@ -14,27 +14,25 @@ router.post('/', adminAuth, async (req, res) => {
 
   let project = await createProject(req.body);
   if (project.length !== 0) {
-    {
-      if (req.body.member_id) {
-        await assignUserRole({
-          member_id: req.body.member_id,
-          project_id: project[0].project_id,
-          role_id: 4,
-        });
-        const result = await addProjectToCompany({
-          company_id: req.body.company_id,
-          project_id: project[0].project_id,
-        });
-        if (result.length > 1) {
-          res
-            .status(400)
-            .send(
-              `Error while adding it to the company with id ${req.body.company_id}`,
-            );
-        }
+    if (req.body.project_admin) {
+      await assignUserRole({
+        member_id: req.body.project_admin,
+        project_id: project[0].project_id,
+        role_id: 4,
+      });
+      const result = await addProjectToCompany({
+        company_id: req.body.company_id,
+        project_id: project[0].project_id,
+      });
+      if (result.length > 1) {
+        res
+          .status(400)
+          .send(
+            `Error while adding it to the company with id ${req.body.company_id}`,
+          );
       }
-      return res.status(200).send('Project added.');
     }
+    return res.status(200).send('Project added.');
   } else {
     return res.status(400).send('Error Occured while creating Project.');
   }

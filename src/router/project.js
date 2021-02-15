@@ -1,7 +1,11 @@
 const express = require('express');
 const _ = require('lodash');
 const { assignUserRole } = require('../service/user');
-const { validateProject, createProject } = require('../service/project');
+const {
+  validateProject,
+  createProject,
+  getAllProjectDetails,
+} = require('../service/project');
 const { addProjectToCompany } = require('../service/company');
 const { adminAuth } = require('../middleware/auth');
 const router = express.Router();
@@ -35,6 +39,15 @@ router.post('/', adminAuth, async (req, res) => {
     return res.status(200).send('Project added.');
   } else {
     return res.status(400).send('Error Occured while creating Project.');
+  }
+});
+
+router.get('/', adminAuth, async (req, res) => {
+  try {
+    const projects = await getAllProjectDetails(req.headers.company_id);
+    res.status(200).send(projects);
+  } catch (error) {
+    console.error(error);
   }
 });
 

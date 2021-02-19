@@ -5,6 +5,7 @@ const {
   validateProject,
   createProject,
   getAllProjectDetails,
+  getAssignedProject,
 } = require('../service/project');
 const { addProjectToCompany } = require('../service/company');
 const { adminAuth } = require('../middleware/auth');
@@ -45,6 +46,15 @@ router.post('/', adminAuth, async (req, res) => {
 router.get('/', adminAuth, async (req, res) => {
   try {
     const projects = await getAllProjectDetails(req.headers.company_id);
+    res.status(200).send(projects);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+router.get('/getassignedproject', async (req, res) => {
+  try {
+    const projects = await getAssignedProject(req.headers.member_id);
     res.status(200).send(projects);
   } catch (error) {
     console.error(error);

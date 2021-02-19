@@ -51,4 +51,25 @@ async function getAllProjectDetails(company_id: string): Promise<void> {
   });
 }
 
-export { validateProject, createProject, getAllProjectDetails };
+async function getAssignedProject(member_id: string): Promise<void> {
+  return await db.then(async pool => {
+    try {
+      const {
+        rows,
+      } = await pool.query(
+        'SELECT project_id, role_id FROM MEMBER_ACCESS where member_id = $1',
+        [member_id],
+      );
+      return rows;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}
+
+export {
+  validateProject,
+  createProject,
+  getAllProjectDetails,
+  getAssignedProject,
+};

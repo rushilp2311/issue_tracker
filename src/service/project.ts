@@ -41,7 +41,7 @@ async function getAllProjectDetails(company_id: string): Promise<void> {
       const {
         rows,
       } = await pool.query(
-        'SELECT project.project_id, project_name, status_id, creation_date, due_date FROM PROJECT LEFT JOIN company_projects on PROJECT.project_id = company_projects.project_id where company_projects.company_id = $1',
+        'SELECT  project_id ,project_name,creation_date,  due_date,name, role_title, status_name FROM ROLE INNER JOIN(SELECT name, role_id, project_id, status_name, project_name, creation_date, due_date from MEMBER INNER JOIN(SELECT member_id, role_id, proj.project_id, status_name, project_name, creation_date, due_date FROM member_access INNER JOIN (SELECT project_id, P.status_id, status_name, project_name, creation_date, due_date  FROM status INNER JOIN (SELECT project.project_id, project_name, status_id, creation_date, due_date FROM PROJECT LEFt JOIN company_projects on PROJECT.project_id = company_projects.project_id where company_projects.company_id = $1) as P on STATUS.status_id = P.status_id) as proj on MEMBER_ACCESS.project_id = proj.project_id) as p on MEMBER.member_id = p.member_id) as pj ON pj.role_id = ROLE.role_id where pj.role_id = 4;',
         [company_id],
       );
       return rows;

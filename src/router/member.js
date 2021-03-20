@@ -5,6 +5,8 @@ const {
   getMemberByEmail,
   changeMemberPassword,
   getAllMembers,
+  updateMemberStatus,
+  addMemberStatus,
 } = require('../service/user');
 const { assignUserRole } = require('../service/user');
 const { adminAuth } = require('../middleware/auth');
@@ -23,7 +25,6 @@ router.post('/registermember', adminAuth, async (req, res) => {
   // const { error } = validateMember(req.body);
   // if (error) return res.status(400).send(error.details[0].message);
   let member = await getMemberByEmail(req.body.email);
-
   if (member.length > 0)
     return res.status(400).send('Member already registered in your team.');
 
@@ -36,12 +37,13 @@ router.post('/registermember', adminAuth, async (req, res) => {
   };
   const salt = await bcrypt.genSalt(10);
   member.password = await bcrypt.hash(member.password, salt);
-  await registerMember(member);
-  res
-    .status(200)
-    .send(
+  const result = await registerMember(member);
+  await addMemberStatus(result[0].member_id);
+  res.status(200).send({
+    member: result[0],
+    message:
       'Member Added Successfully. And Email sent to member with credentials',
-    );
+  });
 });
 
 router.put('/resetpassword', async (req, res) => {
@@ -64,6 +66,11 @@ router.post('/assignrole', adminAuth, async (req, res) => {
     role_id: req.body.role_id,
   });
   if (role.length < 1) res.status(200).send('Role assigned to Member.');
+});
+
+router.delete('/deletemember', adminAuth, async (req, res) => {
+  await updateMemberStatus(req.headers.data);
+  res.send('Member Deleted');
 });
 
 module.exports = router;

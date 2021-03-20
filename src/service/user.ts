@@ -57,9 +57,25 @@ function validateMember(user: User): Joi.ValidationResult {
 async function registerMember(user: User): Promise<User[]> {
   return await db.then(async pool => {
     try {
-      await pool.query(
-        'INSERT INTO member(name, email, company_id, is_admin, password) VALUES ($1, $2, $3, $4, $5)',
+      const {
+        rows,
+      } = await pool.query(
+        'INSERT INTO member(name, email, company_id, is_admin, password) VALUES ($1, $2, $3, $4, $5) RETURNING member_id, email, name, company_id, joining_date, last_login',
         [user.name, user.email, user.company_id, user.is_admin, user.password],
+      );
+      return rows;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}
+
+async function addMemberStatus(member_id: number): Promise<void> {
+  return await db.then(async pool => {
+    try {
+      await pool.query(
+        'INSERT INTO member_status(member_id, member_status) VALUES ($1, 1)',
+        [member_id],
       );
     } catch (error) {
       console.log(error);
@@ -81,10 +97,13 @@ async function getMemberByEmail(email: string): Promise<User[]> {
   });
 }
 
-async function deleteUserByEmail(email: string): Promise<void> {
-  await db.then(async pool => {
+async function updateMemberStatus(member_id: string): Promise<void> {
+  return await db.then(async pool => {
     try {
-      await pool.query('DELETE FROM member WHERE email = $1', [email]);
+      await pool.query(
+        'UPDATE member_status SET member_status = 0 WHERE member_id = $1',
+        [member_id],
+      );
     } catch (error) {
       console.log(error);
     }
@@ -113,7 +132,7 @@ async function getAllMembers(company_id: string): Promise<void> {
       const {
         rows,
       } = await pool.query(
-        'SELECT member_id, name, email, company_id, joining_date, last_login from member where company_id = $1',
+        'SELECT member.member_id, name, email, company_id, joining_date, last_login from member JOIN member_status on member.member_id = member_status.member_id where company_id = $1 and member_status.member_status = 1',
         [company_id],
       );
       return rows;
@@ -148,8 +167,9 @@ export {
   validateLogin,
   validateMember,
   registerMember,
-  deleteUserByEmail,
+  updateMemberStatus,
   assignUserRole,
   changeMemberPassword,
   getAllMembers,
+  addMemberStatus,
 };

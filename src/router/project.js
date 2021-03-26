@@ -1,11 +1,12 @@
 const express = require('express');
 const _ = require('lodash');
-const { assignUserRole } = require('../service/user');
+const { assignUserRole, updateMemberAccess } = require('../service/user');
 const {
   validateProject,
   createProject,
   getAllProjectDetails,
   getAssignedProject,
+  updateProjectDetails,
 } = require('../service/project');
 const { addProjectToCompany } = require('../service/company');
 const { adminAuth } = require('../middleware/auth');
@@ -58,6 +59,26 @@ router.get('/getassignedproject', async (req, res) => {
     res.status(200).send(projects);
   } catch (error) {
     console.error(error);
+  }
+});
+
+router.post('/updateproject', async (req, res) => {
+  try {
+    const {
+      project_id,
+      project_name,
+      due_date,
+      status_id,
+      member_id,
+      prevMember,
+    } = req.body.data;
+    await updateProjectDetails(project_id, project_name, due_date, status_id);
+    await updateMemberAccess(member_id, prevMember, project_id);
+
+    res.status(200).send('Project Details Updated');
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Error occured while updating project data');
   }
 });
 

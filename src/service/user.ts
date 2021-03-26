@@ -126,6 +126,23 @@ async function assignUserRole(access: MemberAccess): Promise<void> {
   });
 }
 
+async function updateMemberAccess(
+  member_id: number,
+  prevMember: number,
+  project_id: number,
+): Promise<void> {
+  return await db.then(async pool => {
+    try {
+      await pool.query(
+        'UPDATE member_access set member_id = $1 where member_id= $2 and project_id= $3 and role_id=4',
+        [member_id, prevMember, project_id],
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}
+
 async function getAllMembers(company_id: string): Promise<void> {
   return await db.then(async pool => {
     try {
@@ -172,4 +189,5 @@ export {
   changeMemberPassword,
   getAllMembers,
   addMemberStatus,
+  updateMemberAccess,
 };

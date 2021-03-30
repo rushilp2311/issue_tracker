@@ -72,9 +72,19 @@ router.post('/updateproject', async (req, res) => {
       member_id,
       prevMember,
     } = req.body.data;
+    console.log(req.body.members);
     await updateProjectDetails(project_id, project_name, due_date, status_id);
     await updateMemberAccess(member_id, prevMember, project_id);
-
+    let result;
+    if (req.body.members.length > 0) {
+      for (let i in req.body.members) {
+        result = await assignUserRole({
+          member_id: req.body.members[i].value.member_id,
+          project_id: project_id,
+          role_id: 2,
+        });
+      }
+    }
     res.status(200).send('Project Details Updated');
   } catch (error) {
     console.log(error);

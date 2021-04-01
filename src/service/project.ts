@@ -57,7 +57,7 @@ async function getAssignedProject(member_id: string): Promise<void> {
       const {
         rows,
       } = await pool.query(
-        'SELECT project_id, role_id FROM MEMBER_ACCESS where member_id = $1',
+        'SELECT p.project_id, role_id, p.project_name, p.due_date, p.creation_date, p.status_id FROM MEMBER_ACCESS INNER JOIN project p on MEMBER_ACCESS.project_id = p.project_id where member_id = $1',
         [member_id],
       );
       return rows;

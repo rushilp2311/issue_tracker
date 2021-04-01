@@ -7,8 +7,9 @@ const {
   getAllMembers,
   updateMemberStatus,
   addMemberStatus,
+  assignUserRole,
 } = require('../service/user');
-const { assignUserRole } = require('../service/user');
+const { getAssignedProject } = require('../service/project');
 const { adminAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -71,6 +72,12 @@ router.post('/assignrole', adminAuth, async (req, res) => {
 router.delete('/deletemember', adminAuth, async (req, res) => {
   await updateMemberStatus(req.headers.data);
   res.send('Member Deleted');
+});
+
+router.get('/getassignedproject', async (req, res) => {
+  const user = await getMemberByEmail(req.headers.email);
+  const result = await getAssignedProject(user[0].member_id);
+  res.status(200).send(result[0]);
 });
 
 module.exports = router;

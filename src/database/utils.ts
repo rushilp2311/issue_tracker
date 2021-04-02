@@ -22,4 +22,26 @@ async function getAllRoles(): Promise<any> {
   });
 }
 
-export { getAllStatus, getAllRoles };
+async function getAllType(): Promise<any> {
+  return await db.then(async pool => {
+    try {
+      const { rows } = await pool.query('SELECT * FROM type');
+      return rows;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}
+
+async function getAllPriority(): Promise<any> {
+  return await db.then(async pool => {
+    try {
+      const { rows } = await pool.query('SELECT * FROM priority');
+      return rows;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}
+
+export { getAllStatus, getAllRoles, getAllType, getAllPriority };

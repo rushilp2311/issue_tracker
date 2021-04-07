@@ -9,8 +9,8 @@ const {
 const router = express.Router();
 
 router.post('/addissue', async (req, res) => {
+  //assign member
   if (req.body.assignee) {
-    console.log('Assignee');
     const user = await getMemberByEmail(req.body.assignee);
   }
   const result = await addIssue(req.body);
@@ -20,11 +20,12 @@ router.post('/addissue', async (req, res) => {
       project_id: req.body.project_id,
     });
   }
-  console.log(result);
+  res.send(result[0]);
 });
 
-router.get('/allissues', async (req, res) => {
+router.get('/getallissues', async (req, res) => {
   const result = await getAllIssuesByProject(req.headers.project_id);
+  res.status(200).send(result);
 });
 
 module.exports = router;

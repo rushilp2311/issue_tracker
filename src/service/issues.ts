@@ -40,7 +40,7 @@ async function getAllIssuesByProject(project_id): Promise<any> {
       const {
         rows,
       } = await pool.query(
-        'SELECT issues.issue_id, issue_title, description, assignee, status_id, type_id, priority, creation_date, due_date, sprint_id, PROJECT_ISSUES.project_id FROM issues LEFT JOIN project_issues ON issues.issue_id = project_issues.issue_id WHERE project_id = $1',
+        'SELECT i.issue_id, issue_title, description, assignee, status_id, type_id, priority, creation_date, due_date, sprint_id, i.project_id, name FROM (SELECT ISSUES.issue_id, issue_title, description, assignee, status_id, type_id, priority, creation_date, due_date, sprint_id, PROJECT_ISSUES.project_id  FROM issues LEFT JOIN project_issues ON issues.issue_id = project_issues.issue_id WHERE project_id = $1) as i LEFT JOIN member on member.member_id = i.assignee',
         [project_id],
       );
       return rows;
@@ -49,5 +49,22 @@ async function getAllIssuesByProject(project_id): Promise<any> {
     }
   });
 }
+async function assignMemberToIssue(member_id, issue_id) {
+  await db.then(async pool => {
+    try {
+      await pool.query('UPDATE issues set assignee = $1 where issue_id = $2', [
+        member_id,
+        issue_id,
+      ]);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+}
 
-export { addIssue, addIssueToProject, getAllIssuesByProject };
+export {
+  addIssue,
+  addIssueToProject,
+  getAllIssuesByProject,
+  assignMemberToIssue,
+};
